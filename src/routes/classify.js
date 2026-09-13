@@ -1,11 +1,13 @@
 import express from "express";
+import fs from "fs";
 import { callModel } from "../llm/model.js";
 import { InputSchema, OutputSchema, STUB_OUTPUT } from "../llm/schema.js";
 
 const router = express.Router();
 
-router.route("/classify").post(async (req, res) => {
+const generateTag = async (req, res) => {
   const parsed = InputSchema.safeParse(req.body);
+
   if (!parsed.success) {
     const issue = parsed.error.issues[0];
     return res.status(400).json({
@@ -24,14 +26,49 @@ router.route("/classify").post(async (req, res) => {
       output = await callModel(parsed.data.description);
     }
 
-    const validateResponse = OutputSchema.parse(output);
-    return res.status(200).json(validateResponse);
+    let parsedOutput = OutputSchema.safeParse(output);
+
+    console.log("parsed output : ", parsedOutput);
+
+    if (!parsedOutput.success) {
+      console.log("retry");
+      output = await callModel(parsed.data.description, {
+        brokenOutput: output,
+        validationError: parsedOutput.error,
+      });
+
+      parsedOutput = OutputSchema.safeParse(output);
+
+      if (!parsedOutput.success) {
+        fs.appendFileSync(
+          "logs/quarantine.jsonl",
+          JSON.stringify({
+            timestamp: new Date().toISOString(),
+            input: parsed.data.description,
+            output,
+            error: parsedOutput.error,
+            prompt_version: "v1",
+          }) + "\n",
+        );
+
+        return res.status(422).json({
+          error: "classification_failed",
+          message: parsedOutput.error,
+        });
+      }
+    }
+
+    return res.json({
+      result: parsedOutput,
+    });
   } catch (err) {
     console.error(err);
     return res
       .status(500)
       .json({ error: "internal_error", message: err.message });
   }
-});
+};
+
+router.route("/classify").post(generateTag);
 
 export { router };

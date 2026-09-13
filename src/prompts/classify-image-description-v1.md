@@ -23,9 +23,10 @@ Return ONLY a JSON object exactly with these fields, nothing else:
 
 - Never invent a category outside the closed list above.
 - Never add fields beyond the four listed.
-- Never return anything except the JSON object — no preamble, no
-  explanation, no markdown code fences around it.
-- Return JSON object in string instead of JSON Markdown.
+- Never return anything except the JSON object —
+  **_NO preamble_**,
+  **_NO explanation_**,
+  **_NO markdown code fences around the JSON Object_**.
 
 ## What to do when unsure
 
