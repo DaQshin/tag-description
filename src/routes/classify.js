@@ -6,6 +6,13 @@ import { InputSchema, OutputSchema, STUB_OUTPUT } from "../llm/schema.js";
 const router = express.Router();
 
 const generateTag = async (req, res) => {
+  if (process.env.LLM_ENABLED === "false") {
+    console.log("llm disabled");
+    return res.status(503).json({
+      error: "llm_disabled",
+    });
+  }
+
   const parsed = InputSchema.safeParse(req.body);
 
   if (!parsed.success) {
@@ -59,7 +66,7 @@ const generateTag = async (req, res) => {
     }
 
     return res.json({
-      result: parsedOutput,
+      result: parsedOutput.data,
     });
   } catch (err) {
     console.error(err);
@@ -69,6 +76,6 @@ const generateTag = async (req, res) => {
   }
 };
 
-router.route("/classify").post(generateTag);
+router.post("/classify", generateTag);
 
 export { router };

@@ -40,33 +40,62 @@ const callModel = async (description, optional = null) => {
     });
   }
 
-  const response = await fetch(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: "Bearer " + process.env.OPENROUTER_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-4o",
-        temperature: 0,
-        response_format: { type: "json_object" },
-        messages,
-      }),
-    },
-  );
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000);
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`OpenRouter API error ${response.status}: ${errorText}`);
+  let content = "";
+
+  try {
+    const startTime = Date.now();
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer " + process.env.OPENROUTER_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-4o",
+          temperature: 0,
+          response_format: { type: "json_object" },
+          messages,
+        }),
+      },
+    );
+
+    const duration = Date.now() - startTime;
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`OpenRouter API error ${response.status}: ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log(
+      JSON.stringify({
+        model: data.model,
+        prompt_version: "v1",
+        usage: {
+          input_tokens: data?.usage.prompt_tokens,
+          output_tokens: data?.usage.completion_tokens,
+          cost: data?.usage.cost,
+        },
+        duration,
+        repair: optional !== null,
+      }),
+    );
+    content = data.choices[0].message.content;
+
+    clearTimeout(timeoutId);
+  } catch (err) {
+    clearTimeout(timeoutId);
+
+    if (err.name === "AbortError") throw new Error("MODEL_TIMEOUT");
+    throw err;
   }
 
-  const data = await response.json();
-  const content = data.choices[0].message.content;
-
   console.log(content);
-
   return JSON.parse(content);
 };
 

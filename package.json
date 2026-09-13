@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "dev": "nodemon ./src/server.js",
-    "test": "node ./src/llm/checks.js"
+    "dev": "nodemon ./src/server.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +12,7 @@
   "dependencies": {
     "express": "^5.2.1",
     "ollama": "^0.6.3",
+    "supertest": "^7.2.2",
     "zod": "^4.6.2"
   },
   "devDependencies": {
