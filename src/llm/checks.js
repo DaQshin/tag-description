@@ -41,7 +41,8 @@ async function checkOpenRouter() {
     },
   );
 
-  console.log(response);
+  const data = await response.json();
+  console.log(data.choices[0].message.content);
 }
 
 checkOllama().catch((err) => console.log(err));

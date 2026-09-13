@@ -1,9 +1,8 @@
 import express from "express";
+import { callModel } from "../llm/model.js";
 import { InputSchema, OutputSchema, STUB_OUTPUT } from "../llm/schema.js";
 
 const router = express.Router();
-
-const callModel = async (description) => {};
 
 router.route("/classify").post(async (req, res) => {
   const parsed = InputSchema.safeParse(req.body);
