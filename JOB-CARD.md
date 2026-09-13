@@ -1,12 +1,12 @@
-What it does:
+**_What it does:_**
 
 Classifies an image description into fixed categories with structured tags
 
-Input:
+**_Input:_**
 
 {"description" : "string, 5-300 characters"}
 
-Output:
+**_Output:_**
 
 {
 "category" : one of [animal|landscape|people|object|food|other],
@@ -15,6 +15,6 @@ Output:
 "needs_review": boolean
 }
 
-When unsure it should:
+**_When unsure it should:_**
 
 return category "other" with low confidence, not a guess

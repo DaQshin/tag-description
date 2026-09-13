@@ -1,25 +1,12 @@
-const express = require("express");
+import express from "express";
+import morgan from "morgan";
+import { router } from "./routes/classify.js";
+
 const app = express();
 
 app.use(express.json());
+app.use(morgan("dev"));
 
-fetch("https://openrouter.ai/api/v1/chat/completions", {
-  method: "POST",
-  headers: {
-    Authorization: "Bearer " + process.env.OPENROUTER_API_KEY,
-    "HTTP-Referer": "<YOUR_SITE_URL>",
-    "X-Title": "<YOUR_SITE_NAME>",
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    model: "openai/gpt-4o",
-    messages: [
-      {
-        role: "user",
-        content: "What is the meaning of life?",
-      },
-    ],
-  }),
-});
+app.use("/api/v1", router);
 
-module.exports = app;
+export { app };
