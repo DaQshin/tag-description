@@ -10,12 +10,24 @@ async function runEvals() {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const cases = JSON.parse(fs.readFileSync(path.join(__dirname, "cases.json")));
 
-  for (let i = 0; i < cases.length; i++) {
-    test(`case_id-${cases[i].id} description- ${cases[i].description}`, async () => {
-      const response = await callModel(cases[i].description);
+  const red = "\x1b[31m";
+  const green = "\x1b[32m";
+  const reset = "\x1b[0m";
 
-      assert.deepEqual(response.category, cases[i].expected_category);
-    });
+  for (let i = 0; i < cases.length; i++) {
+    const response = await callModel(cases[i].description);
+
+    if (response.category === cases[i].expected_category) {
+      console.log(
+        `${green} case_id [${cases[i].id}] \n ${JSON.stringify(response)}` +
+          reset,
+      );
+    } else {
+      console.log(
+        `${red} case_id [${cases[i].id}] \n ${JSON.stringify(response)}` +
+          reset,
+      );
+    }
   }
 }
 

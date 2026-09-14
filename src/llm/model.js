@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { cacheKey, loadCache, saveCache } from "./cache.js";
 import "dotenv/config";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -10,6 +11,15 @@ const SYSTEM_PROMPT = fs.readFileSync(
 );
 
 const callModel = async (description, optional = null) => {
+  const cache = loadCache();
+
+  const key = cacheKey(description);
+
+  if (cache[key]) {
+    console.log(JSON.stringify({ cacheHit: true, result: cache[key] }));
+    return JSON.parse(cache[key]);
+  }
+
   let messages = [
     {
       role: "system",
@@ -72,6 +82,17 @@ const callModel = async (description, optional = null) => {
     }
 
     const data = await response.json();
+
+    // console.log(data.choices[0].message);
+
+    if (data.finish_reason === "content_filter") {
+      throw new Error("MODEL_REFUSAL: content filtered");
+    } else if (!data.choices[0].message.content) {
+      throw new Error("MODEL_REFUSAL: empty content");
+    } else if (data.choices[0].message.refusal) {
+      throw new Error("MODEL_REFUSAL: model refused to answer");
+    }
+
     console.log(
       JSON.stringify({
         model: data.model,
@@ -87,6 +108,9 @@ const callModel = async (description, optional = null) => {
     );
     content = data.choices[0].message.content;
 
+    cache[key] = content;
+    saveCache(cache);
+
     clearTimeout(timeoutId);
   } catch (err) {
     clearTimeout(timeoutId);
@@ -95,7 +119,7 @@ const callModel = async (description, optional = null) => {
     throw err;
   }
 
-  console.log(content);
+  //   console.log(content);
   return JSON.parse(content);
 };
 

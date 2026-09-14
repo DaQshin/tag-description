@@ -1,3 +1,23 @@
+# Image Description Classifier
+
+## What it does
+
+You give this a short sentence describing a picture — like "a golden
+retriever running across a grassy field" — and it tells you what kind of
+picture it is. It sorts the description into one of six categories (animal,
+landscape, people, object, food, or other), gives a short phrase naming the
+main subject, and says how confident it is, from 0 to 1. If it isn't sure,
+it says so honestly instead of guessing, and flags the result for a human to
+double-check.
+
+## Try it
+
+```bash
+curl -X POST http://localhost:3000/classify \
+  -H "Content-Type: application/json" \
+  -d '{"description": "A golden retriever running across a grassy field"}'
+```
+
 ## Setup
 
 ```bash
