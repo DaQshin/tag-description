@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "description": "A golden retriever running across a grassy field",
+    "expected_category": "animal"
+  },
+  {
+    "id": 2,
+    "description": "A snow-capped mountain range under a pink sunset sky",
+    "expected_category": "landscape"
+  },
+  {
+    "id": 3,
+    "description": "Two friends laughing together at an outdoor cafe table",
+    "expected_category": "people"
+  },
+  {
+    "id": 4,
+    "description": "A stack of pancakes with syrup and a pat of butter on top",
+    "expected_category": "food"
+  },
+  {
+    "id": 5,
+    "description": "A vintage typewriter sitting on a wooden desk",
+    "expected_category": "object"
+  },
+  {
+    "id": 6,
+    "description": "Something dark and out of focus, hard to make out any shape",
+    "expected_category": "other",
+    "note": "ambiguous case — description is genuinely unclear"
+  },
+  {
+    "id": 7,
+    "description": "asdkjfh 12345 !!! ???",
+    "expected_category": "other",
+    "note": "should hit the 'when unsure' rule — nonsense input, low confidence expected"
+  },
+  {
+    "id": 8,
+    "description": "A red fox standing in a misty forest clearing at dawn",
+    "expected_category": "animal"
+  }
+]
